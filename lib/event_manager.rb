@@ -66,7 +66,10 @@ contents.each do |row|
 
   form_letter = erb_template.result(binding)
 
+  reg_time = Time.strptime(row[1], '%D %R')
+
+
   #save_thank_you_letter(id, form_letter)  
   
-  puts "#{name}'s phone number: #{phone}"
+  puts "#{name} registration time: #{reg_time.hour}"
 end
