@@ -31,6 +31,21 @@ def save_thank_you_letter(id, form_letter)
   end
 end
 
+def format_phone(phone_array)
+  area_code = phone_array.slice(0, 3).join
+  first_half = phone_array.slice(3, 3).join
+  second_half = phone_array.slice(6, 4).join
+  "(#{area_code}) #{first_half}-#{second_half}"
+end
+
+def clean_phone(phone_string)
+  phone = phone_string.scan(/\d/)
+  if (phone.length == 11 && phone[0] == "1") || phone.length == 10
+    return format_phone(phone.last(10))
+  end
+  return "No valid phone number on file"
+end
+
 puts 'EventManager Initialized'
 
 contents = CSV.open(
@@ -47,8 +62,11 @@ contents.each do |row|
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
   legislators = legislators_by_zipcode(zipcode)
+  phone = clean_phone(row[:homephone])
 
   form_letter = erb_template.result(binding)
 
-  save_thank_you_letter(id, form_letter)  
+  #save_thank_you_letter(id, form_letter)  
+  
+  puts "#{name}'s phone number: #{phone}"
 end
