@@ -48,12 +48,12 @@ def clean_phone(phone_string)
 end
 
 def highest_freq_from_hash(frequency_hash)
-  frequency_hash.reduce({max: 0, hours: []}) do |max_hash, (hour, frequency)|
+  frequency_hash.reduce({max: 0, stat: []}) do |max_hash, (stat, frequency)|
     unless max_hash[:max] > frequency
       if max_hash[:max] == frequency
-        max_hash[:hours] << hour
+        max_hash[:stat] << stat
       else
-        max_hash[:hours] = [hour]
+        max_hash[:stat] = [stat]
       end
       max_hash[:max] = frequency
     end
@@ -62,9 +62,9 @@ def highest_freq_from_hash(frequency_hash)
 end
 
 def frequency_hash(attendees, stat)
-  attendees.each_with_object(Hash.new) do |attendee, times_frequency|
+  attendees.each_with_object(Hash.new) do |attendee, frequency|
   attendee_stat = attendee[stat]
-  times_frequency[attendee_stat] = times_frequency[attendee_stat] ? times_frequency[attendee_stat] + 1 : 1
+  frequency[attendee_stat] = frequency[attendee_stat] ? frequency[attendee_stat] + 1 : 1
   end
 end
 
