@@ -46,6 +46,27 @@ def clean_phone(phone_string)
   return "No valid phone number on file"
 end
 
+def hifreq_reg_hours_from_hash(frequency_hash)
+  frequency_hash.reduce({max: 0, hours: []}) do |max_hash, (hour, frequency)|
+    unless max_hash[:max] > frequency
+      if max_hash[:max] == frequency
+        max_hash[:hours] << hour
+      else
+        max_hash[:hours] = [hour]
+      end
+      max_hash[:max] = frequency
+    end
+    max_hash
+  end
+end
+
+def frequency_hash(attendees)
+  attendees.each_with_object(Hash.new) do |attendee, times_frequency|
+  reg_hour = attendee[:reg_time].hour
+  times_frequency[reg_hour] = times_frequency[reg_hour] ? times_frequency[reg_hour] + 1 : 1
+  end
+end
+
 puts 'EventManager Initialized'
 
 contents = CSV.open(
@@ -57,7 +78,7 @@ contents = CSV.open(
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
 
-contents.each do |row|
+attendees = contents.map do |row|
   id = row[0]
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
@@ -68,8 +89,9 @@ contents.each do |row|
 
   reg_time = Time.strptime(row[1], '%D %R')
 
-
   #save_thank_you_letter(id, form_letter)  
   
-  puts "#{name} registration time: #{reg_time.hour}"
+  {id: id, name: name, zipcode: zipcode, legislators: legislators, phone: phone, reg_time: reg_time}
 end
+
+puts hifreq_reg_hours_from_hash(frequency_hash(attendees))
